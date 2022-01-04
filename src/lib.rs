@@ -2,7 +2,13 @@ use std::io::Write;
 
 use ansi_term::Style;
 
-/// Handle a subcommand's script
+/// Handle a workflow
+///
+/// # Arguments
+///
+/// * `script` - The script for this workflow
+///
+/// * `args` - The arguments passed to this workflow
 pub fn handle(script: String, args: liquid::Object) {
 	let rendered = render(script, args);
 	let process = run_script::spawn_script!(rendered).unwrap();
@@ -17,7 +23,13 @@ pub fn handle(script: String, args: liquid::Object) {
 	std::io::stdout().write_all(&output.stderr).unwrap();
 }
 
-/// Render a subcommand's script
+/// Render a subcommand's script using its arguments
+///
+/// # Arguments
+///
+/// * `script` - The script for this workflow
+///
+/// * `args` - The arguments passed to this workflow
 pub fn render(script: String, args: liquid::Object) -> String {
 	let template = create_liquid_parser().parse(&script).unwrap();
 	template.render(&args).unwrap()
