@@ -16,9 +16,12 @@ use yaml_rust::{Yaml, YamlLoader};
 static GLOBAL: MiMalloc = MiMalloc;
 
 lazy_static! {
+  /// odofile contents
 	pub static ref ODOFILE: String =
 		std::fs::read_to_string("./odofile").expect("No odofile found.");
+  /// YAML document containing data from odofile
 	pub static ref DOCS: Vec<Yaml> = YamlLoader::load_from_str(&ODOFILE).unwrap();
+  /// YAML data from odofile
 	pub static ref DOC: &'static Yaml = &DOCS[0];
 }
 
@@ -66,14 +69,6 @@ fn main() {
 		.into_iter()
 		.map(|x| x.as_hash().unwrap())
 		.collect();
-	//let inner_hmaps = actions.iter().map(|x| x.1.as_hash().unwrap().iter().map(|y| y.1.as_vec().unwrap().iter().map(|z| z.as_str().unwrap()).collect()).collect()).collect::<Vec<Vec<Vec<&str>>>>();
-	//println!("{:#?}", actions[&Yaml::String("two".to_owned())]["args"].as_vec().unwrap());
-	//println!("{:#?}", actions);
-	//println!("{:#?}", commands);
-	//println!("{:#?}", inner);
-	//println!("{:#?}", hmaps);
-	//println!("{:#?}", inner_hmaps);
-	//println!("{:#?}\n\n{:#?}", keys, values);
 	for i in 0..keys.len() {
 		let args = values[i].contains_key(&Yaml::from_str("args"));
 		let mut subcommand = App::new(keys[i]);
@@ -85,7 +80,6 @@ fn main() {
 					.iter()
 					.map(|x| x.as_str().unwrap())
 					.collect::<Vec<&str>>();
-				//println!("{:#?}", args_vec);
 				for j in 0..args_vec.len() {
 					let lit: &'static str = &args_vec[j][..];
 					subcommand = subcommand.arg(
@@ -100,32 +94,6 @@ fn main() {
 		}
 		cli = cli.subcommand(subcommand);
 	}
-	// for command in commands {
-	//   cli = cli.subcommand(App::new(command));
-	// }
-	// // let mut subcommands: Vec<clap::App> = Vec::new();
-	// for (key, _) in actions {
-	// 	let name = key.as_str().unwrap();
-	// 	let args_vec = actions[&key]["args"].as_vec().unwrap().to_owned();
-	// 	println!("{}: {:#?}", key.as_str().unwrap(), args_vec);
-	//   println!("{:#?}", args_vec);
-	// let mut args = args_vec.iter().map(|x| x.as_str().unwrap());
-	// while args.next() != None {
-	//   cli = cli.subcommand(App::new(name).arg(Arg::new(args.next().unwrap())));
-	// }
-
-	// args_vec.into_iter().for_each(|arg| {
-	//   cli = cli.subcommand(App::new(name).arg(Arg::new(arg)));
-	// 	// subcommands.push());
-	// });
-	// for arg_string in args {
-
-	// }
-	//}
-
-	// for subcommand in subcommands {
-	// 	cli = cli.subcommand(subcommand);
-	// }
 
 	let matches = cli.get_matches();
 	if matches.subcommand() == None {
@@ -138,8 +106,6 @@ fn main() {
 	let mut match_args_map: HashMap<String, liquid::model::Value> = HashMap::new();
 	let has_args =
 		match_name != "show" && !(&(actions)[&match_name_yaml]["args"].is_null()).to_owned();
-	//println!("{}", has_args);
-	//println!("{:#?}", match_args_raw);
 
 	let match_script = if match_name != "show" {
 		&(actions)[&match_name_yaml]["run"].as_str().unwrap()
@@ -163,7 +129,6 @@ fn main() {
 	let match_args = liquid::object!({
 		"args": match_args_map,
 	});
-	//println!("{:#?}", match_args);
 	match matches.subcommand() {
 		Some(("show", show_matches)) => {
 			show(show_matches);
@@ -171,20 +136,6 @@ fn main() {
 		None => println!("odo {}", crate_version!()),
 		Some(_) => lib::handle(match_script.to_string(), match_args),
 	}
-
-	// match matches.subcommand() {
-	// 	Some(("show", show_matches)) => {
-	// 		show(show_matches);
-	// 	}
-	// 	Some(("compress", package_matches)) => {
-	// 		lib::compress_archive(package_matches);
-	// 	}
-	// 	Some(("extract", package_matches)) => {
-	// 		lib::extract_archive(package_matches);
-	// 	}
-	// 	None => println!("{}", cli.get_about().unwrap()),
-	// 	_ => unreachable!(), // If all subcommands are defined above, anything else is unreachable!()
-	// }
 }
 
 /// Shows information regarding the usage and handling of this software
