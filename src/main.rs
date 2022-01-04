@@ -5,13 +5,21 @@ use std::collections::HashMap;
 
 use clap::{crate_version, App, Arg};
 use linked_hash_map::LinkedHashMap;
+use liquid::ValueView;
 use mimalloc::MiMalloc;
 use serde::Serializer;
 use yaml_rust::{Yaml, YamlLoader};
+use lazy_static::lazy_static;
 
 #[global_allocator]
 /// The global memory allocator
 static GLOBAL: MiMalloc = MiMalloc;
+
+lazy_static! {
+  pub static ref ODOFILE: String = std::fs::read_to_string("./odofile").expect("No odofile found.");
+	pub static ref DOCS: Vec<Yaml> = YamlLoader::load_from_str(&ODOFILE).unwrap();
+	pub static ref DOC: &'static Yaml = &DOCS[0];
+}
 
 /// The main function of odo's CLI
 fn main() {
@@ -40,10 +48,8 @@ fn main() {
 		.author("Emil Sayahi")
 		.about("odo is a productivity tool for running codebase workflows.");
 
-	let odofile = std::fs::read_to_string("./odofile").expect("No odofile found.");
-	let docs = YamlLoader::load_from_str(&odofile).unwrap();
-	let doc = &docs[0];
-	let actions = doc.as_hash().unwrap();
+	
+	let actions = DOC.as_hash().unwrap();
 	let commands = actions
 		.iter()
 		.map(|x| x.0.as_str().unwrap())
@@ -79,19 +85,24 @@ fn main() {
 	//println!("{:#?}", inner);
 	//println!("{:#?}", hmaps);
 	//println!("{:#?}", inner_hmaps);
-	println!("{:#?}\n\n{:#?}", keys, values);
+	//println!("{:#?}\n\n{:#?}", keys, values);
 	for i in 0..keys.len() {
 		let args = values[i].contains_key(&Yaml::from_str("args"));
+    let mut subcommand = App::new(keys[i]);
 		match args {
 			true => {
-				// for j in 0..unwrapped_args.len() {
-				//   //cli = cli.subcommand(App::new(keys[i]).arg(Arg::new(unwrapped_args[j].as_str().unwrap())));
-				// }
+        let args_vec: &Vec<&str> = &values[i][&Yaml::from_str("args")].as_vec().unwrap().iter().map(|x| x.as_str().unwrap()).collect::<Vec<&str>>();
+        //println!("{:#?}", args_vec);
+				for j in 0..args_vec.len() {
+          let lit: &'static str = &args_vec[j][..];
+				  subcommand = subcommand.arg(Arg::new(lit).long(lit).short(lit.chars().nth(0).unwrap()).takes_value(true));
+				}
 			}
 			false => {
-				cli = cli.subcommand(App::new(keys[i]));
+				
 			}
 		}
+    cli = cli.subcommand(subcommand);
 	}
 	// for command in commands {
 	//   cli = cli.subcommand(App::new(command));
@@ -124,16 +135,19 @@ fn main() {
 	let match_name = matches.subcommand().unwrap().0;
 	let match_name_yaml = Yaml::String(match_name.to_string());
 	let match_args_raw = matches.subcommand().unwrap().1;
-	let mut match_args_map: HashMap<String, liquid::Object> = HashMap::new();
-	let has_args = &(actions)[&match_name_yaml]["args"].is_null().to_owned();
+	let mut match_args_map: HashMap<String, liquid::model::Value> = HashMap::new();
+	let has_args = !(&(actions)[&match_name_yaml]["args"].is_null()).to_owned();
+  //println!("{}", has_args);
+  //println!("{:#?}", match_args_raw);
 
 	let match_script = &(actions)[&match_name_yaml]["run"].as_str().unwrap();
-	if has_args == &true {
+	if has_args == true {
 		let args_vec = &(actions)[&match_name_yaml]["args"].as_vec().unwrap();
 		for arg in *args_vec {
+      println!("{}", arg.as_str().unwrap());
 			match_args_map.insert(
 				arg.as_str().unwrap().to_string(),
-				liquid::object!(match_args_raw.value_of(arg.as_str().unwrap())),
+				match_args_raw.value_of(arg.as_str().unwrap()).unwrap().to_value(),
 			);
 		}
 	}
@@ -141,6 +155,7 @@ fn main() {
 	let match_args = liquid::object!({
 		"args": match_args_map,
 	});
+  //println!("{:#?}", match_args);
 	lib::handle(match_script.to_string(), match_args);
 
 	// match matches.subcommand() {
