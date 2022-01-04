@@ -81,11 +81,11 @@ fn main() {
 					.map(|x| x.as_str().unwrap())
 					.collect::<Vec<&str>>();
 				for j in 0..args_vec.len() {
-					let lit: &'static str = &args_vec[j][..];
+					let lit: &'static str = args_vec[j];
 					subcommand = subcommand.arg(
 						Arg::new(lit)
 							.long(lit)
-							.short(lit.chars().nth(0).unwrap())
+							.short(lit.chars().next().unwrap())
 							.takes_value(true),
 					);
 				}
@@ -108,11 +108,11 @@ fn main() {
 		match_name != "show" && !(&(actions)[&match_name_yaml]["args"].is_null()).to_owned();
 
 	let match_script = if match_name != "show" {
-		&(actions)[&match_name_yaml]["run"].as_str().unwrap()
+		(actions)[&match_name_yaml]["run"].as_str().unwrap()
 	} else {
 		""
 	};
-	if has_args == true {
+	if has_args {
 		let args_vec = &(actions)[&match_name_yaml]["args"].as_vec().unwrap();
 		for arg in *args_vec {
 			println!("{}", arg.as_str().unwrap());
