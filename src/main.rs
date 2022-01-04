@@ -3,7 +3,7 @@ mod lib;
 
 use std::collections::HashMap;
 
-use clap::{crate_version, App, Arg, arg};
+use clap::{arg, crate_version, App, Arg};
 use lazy_static::lazy_static;
 use linked_hash_map::LinkedHashMap;
 use liquid::ValueView;
@@ -48,7 +48,12 @@ fn main() {
 		.version(crate_version!())
 		.author("Emil Sayahi")
 		.about("odo is a productivity tool for running codebase workflows.")
-    .subcommand(App::new("show").about("Shows information regarding the usage and handling of this software").arg(arg!(-w --warranty "Prints warranty information")).arg(arg!(-c --conditions "Prints conditions information")));
+		.subcommand(
+			App::new("show")
+				.about("Shows information regarding the usage and handling of this software")
+				.arg(arg!(-w --warranty "Prints warranty information"))
+				.arg(arg!(-c --conditions "Prints conditions information")),
+		);
 
 	let actions = DOC.as_hash().unwrap();
 	let keys: Vec<&str> = actions
@@ -123,19 +128,24 @@ fn main() {
 	// }
 
 	let matches = cli.get_matches();
-  if matches.subcommand() == None {
-    println!("odo {}", crate_version!());
-    std::process::exit(0);
-  }
+	if matches.subcommand() == None {
+		println!("odo {}", crate_version!());
+		std::process::exit(0);
+	}
 	let match_name = matches.subcommand().unwrap().0;
 	let match_name_yaml = Yaml::String(match_name.to_string());
 	let match_args_raw = matches.subcommand().unwrap().1;
 	let mut match_args_map: HashMap<String, liquid::model::Value> = HashMap::new();
-	let has_args = match_name != "show" && !(&(actions)[&match_name_yaml]["args"].is_null()).to_owned();
+	let has_args =
+		match_name != "show" && !(&(actions)[&match_name_yaml]["args"].is_null()).to_owned();
 	//println!("{}", has_args);
 	//println!("{:#?}", match_args_raw);
 
-	let match_script = if match_name != "show" { &(actions)[&match_name_yaml]["run"].as_str().unwrap() } else {""};
+	let match_script = if match_name != "show" {
+		&(actions)[&match_name_yaml]["run"].as_str().unwrap()
+	} else {
+		""
+	};
 	if has_args == true {
 		let args_vec = &(actions)[&match_name_yaml]["args"].as_vec().unwrap();
 		for arg in *args_vec {
@@ -154,14 +164,13 @@ fn main() {
 		"args": match_args_map,
 	});
 	//println!("{:#?}", match_args);
-  match matches.subcommand() {
+	match matches.subcommand() {
 		Some(("show", show_matches)) => {
 			show(show_matches);
-		},
+		}
 		None => println!("odo {}", crate_version!()),
 		Some(_) => lib::handle(match_script.to_string(), match_args),
 	}
-	
 
 	// match matches.subcommand() {
 	// 	Some(("show", show_matches)) => {
