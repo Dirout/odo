@@ -26,7 +26,7 @@ fn main() {
 		);
 	}));
 
-  println!(
+	println!(
 		"
     odo  Copyright (C) 2022  Emil Sayahi
     This program comes with ABSOLUTELY NO WARRANTY; for details type `odo show -w'.
@@ -44,54 +44,76 @@ fn main() {
 	let docs = YamlLoader::load_from_str(&odofile).unwrap();
 	let doc = &docs[0];
 	let actions = doc.as_hash().unwrap();
-  let commands = actions.iter().map(|x| x.0.as_str().unwrap()).collect::<Vec<&str>>();
-  let inner = actions.iter().map(|x| x.1.as_hash().unwrap()).collect::<Vec<&LinkedHashMap<Yaml, Yaml>>>();
-  let hmaps = actions.iter().map(|x| x.1.as_hash().unwrap().iter().map(|y| y.0.as_str().unwrap()).collect()).collect::<Vec<Vec<&str>>>();
-  let keys: Vec<&str> = actions.keys().into_iter().map(|x| x.as_str().unwrap()).collect();
-  let values: Vec<&LinkedHashMap<Yaml, Yaml>> = actions.values().into_iter().map(|x| x.as_hash().unwrap()).collect();
-  //let inner_hmaps = actions.iter().map(|x| x.1.as_hash().unwrap().iter().map(|y| y.1.as_vec().unwrap().iter().map(|z| z.as_str().unwrap()).collect()).collect()).collect::<Vec<Vec<Vec<&str>>>>();
-  //println!("{:#?}", actions[&Yaml::String("two".to_owned())]["args"].as_vec().unwrap());
-  //println!("{:#?}", actions);
-  //println!("{:#?}", commands);
-  //println!("{:#?}", inner);
-  //println!("{:#?}", hmaps);
-  //println!("{:#?}", inner_hmaps);
-  println!("{:#?}\n\n{:#?}", keys, values);
-  for i in 0..keys.len() {
-    let args = values[i].contains_key(&Yaml::from_str("args"));
-    match args {
-      true => {
-        // for j in 0..unwrapped_args.len() {
-        //   //cli = cli.subcommand(App::new(keys[i]).arg(Arg::new(unwrapped_args[j].as_str().unwrap())));
-        // }
-        
-      },
-      false => {
-        cli = cli.subcommand(App::new(keys[i]));
-      }
-    }
-  }
-  // for command in commands {
-  //   cli = cli.subcommand(App::new(command));
-  // }
+	let commands = actions
+		.iter()
+		.map(|x| x.0.as_str().unwrap())
+		.collect::<Vec<&str>>();
+	let inner = actions
+		.iter()
+		.map(|x| x.1.as_hash().unwrap())
+		.collect::<Vec<&LinkedHashMap<Yaml, Yaml>>>();
+	let hmaps = actions
+		.iter()
+		.map(|x| {
+			x.1.as_hash()
+				.unwrap()
+				.iter()
+				.map(|y| y.0.as_str().unwrap())
+				.collect()
+		})
+		.collect::<Vec<Vec<&str>>>();
+	let keys: Vec<&str> = actions
+		.keys()
+		.into_iter()
+		.map(|x| x.as_str().unwrap())
+		.collect();
+	let values: Vec<&LinkedHashMap<Yaml, Yaml>> = actions
+		.values()
+		.into_iter()
+		.map(|x| x.as_hash().unwrap())
+		.collect();
+	//let inner_hmaps = actions.iter().map(|x| x.1.as_hash().unwrap().iter().map(|y| y.1.as_vec().unwrap().iter().map(|z| z.as_str().unwrap()).collect()).collect()).collect::<Vec<Vec<Vec<&str>>>>();
+	//println!("{:#?}", actions[&Yaml::String("two".to_owned())]["args"].as_vec().unwrap());
+	//println!("{:#?}", actions);
+	//println!("{:#?}", commands);
+	//println!("{:#?}", inner);
+	//println!("{:#?}", hmaps);
+	//println!("{:#?}", inner_hmaps);
+	println!("{:#?}\n\n{:#?}", keys, values);
+	for i in 0..keys.len() {
+		let args = values[i].contains_key(&Yaml::from_str("args"));
+		match args {
+			true => {
+				// for j in 0..unwrapped_args.len() {
+				//   //cli = cli.subcommand(App::new(keys[i]).arg(Arg::new(unwrapped_args[j].as_str().unwrap())));
+				// }
+			}
+			false => {
+				cli = cli.subcommand(App::new(keys[i]));
+			}
+		}
+	}
+	// for command in commands {
+	//   cli = cli.subcommand(App::new(command));
+	// }
 	// // let mut subcommands: Vec<clap::App> = Vec::new();
 	// for (key, _) in actions {
 	// 	let name = key.as_str().unwrap();
 	// 	let args_vec = actions[&key]["args"].as_vec().unwrap().to_owned();
 	// 	println!("{}: {:#?}", key.as_str().unwrap(), args_vec);
-  //   println!("{:#?}", args_vec);
-    // let mut args = args_vec.iter().map(|x| x.as_str().unwrap());
-    // while args.next() != None {
-    //   cli = cli.subcommand(App::new(name).arg(Arg::new(args.next().unwrap())));
-    // }
+	//   println!("{:#?}", args_vec);
+	// let mut args = args_vec.iter().map(|x| x.as_str().unwrap());
+	// while args.next() != None {
+	//   cli = cli.subcommand(App::new(name).arg(Arg::new(args.next().unwrap())));
+	// }
 
-		// args_vec.into_iter().for_each(|arg| {
-    //   cli = cli.subcommand(App::new(name).arg(Arg::new(arg)));
-		// 	// subcommands.push());
-		// });
-		// for arg_string in args {
-			
-		// }
+	// args_vec.into_iter().for_each(|arg| {
+	//   cli = cli.subcommand(App::new(name).arg(Arg::new(arg)));
+	// 	// subcommands.push());
+	// });
+	// for arg_string in args {
+
+	// }
 	//}
 
 	// for subcommand in subcommands {
@@ -103,19 +125,19 @@ fn main() {
 	let match_name_yaml = Yaml::String(match_name.to_string());
 	let match_args_raw = matches.subcommand().unwrap().1;
 	let mut match_args_map: HashMap<String, liquid::Object> = HashMap::new();
-  let has_args = &(actions)[&match_name_yaml]["args"].is_null().to_owned();
-	
+	let has_args = &(actions)[&match_name_yaml]["args"].is_null().to_owned();
+
 	let match_script = &(actions)[&match_name_yaml]["run"].as_str().unwrap();
-  if has_args == &true {
-    let args_vec = &(actions)[&match_name_yaml]["args"].as_vec().unwrap();
-    for arg in *args_vec {
-      match_args_map.insert(
-        arg.as_str().unwrap().to_string(),
-        liquid::object!(match_args_raw.value_of(arg.as_str().unwrap())),
-      );
-    }
-  }
-	
+	if has_args == &true {
+		let args_vec = &(actions)[&match_name_yaml]["args"].as_vec().unwrap();
+		for arg in *args_vec {
+			match_args_map.insert(
+				arg.as_str().unwrap().to_string(),
+				liquid::object!(match_args_raw.value_of(arg.as_str().unwrap())),
+			);
+		}
+	}
+
 	let match_args = liquid::object!({
 		"args": match_args_map,
 	});
