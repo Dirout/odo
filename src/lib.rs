@@ -2,7 +2,6 @@ use std::io::Write;
 
 use ansi_term::Style;
 
-
 /// Handle a subcommand's script
 pub fn handle(script: String, args: liquid::Object) {
 	let rendered = render(script, args);
