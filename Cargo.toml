@@ -38,6 +38,7 @@ doc = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+ansi_term = "0.12.1"
 clap = { version = "3.0.1", features = ["cargo", "suggestions", "color", "wrap_help", "unicode"] }
 linked-hash-map = "0.5.4"
 liquid = "0.23.1"

@@ -1,11 +1,21 @@
+use std::io::Write;
+
+use ansi_term::Style;
+use run_script::ScriptOptions;
+
 /// Handle a subcommand's script
 pub fn handle(script: String, args: liquid::Object) {
 	let rendered = render(script, args);
 	let mut process = run_script::spawn_script!(rendered).unwrap();
-	println!(
-		"Exit status: {}",
-		process.wait().expect("Process did not start.")
-	);
+	let output = process.wait_with_output().expect("Process did not start.");
+
+	println!("▶ {}", Style::new().bold().paint(output.status.to_string()));
+
+	println!("▶ {}: ", Style::new().bold().paint("output"));
+	std::io::stdout().write_all(&output.stdout);
+
+	println!("▶ {}: ", Style::new().bold().paint("errors"));
+	std::io::stdout().write_all(&output.stderr);
 }
 
 /// Render a subcommand's script
