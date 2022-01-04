@@ -11,10 +11,10 @@ pub fn handle(script: String, args: liquid::Object) {
 	println!("▶ {}", Style::new().bold().paint(output.status.to_string()));
 
 	println!("▶ {}: ", Style::new().bold().paint("output"));
-	std::io::stdout().write_all(&output.stdout);
+	std::io::stdout().write_all(&output.stdout).unwrap();
 
 	println!("▶ {}: ", Style::new().bold().paint("errors"));
-	std::io::stdout().write_all(&output.stderr);
+	std::io::stdout().write_all(&output.stderr).unwrap();
 }
 
 /// Render a subcommand's script
