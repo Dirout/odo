@@ -1,9 +1,0 @@
-# This is a test odofile
-one:
-    run: |
-        echo "Hello!"
-two:
-    args:
-        - name
-    run: |
-        echo "Hello, {{ args.name }}!"
