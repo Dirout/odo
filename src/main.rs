@@ -105,7 +105,7 @@ fn main() {
 	let match_args_raw = matches.subcommand().unwrap().1;
 	let mut match_args_map: HashMap<String, liquid::model::Value> = HashMap::new();
 	let has_args =
-		match_name != "show" && !(&(actions)[&match_name_yaml]["args"].is_null()).to_owned();
+		match_name != "show" && !(actions)[&match_name_yaml]["args"].is_null().to_owned();
 
 	let match_script = if match_name != "show" {
 		(actions)[&match_name_yaml]["run"].as_str().unwrap()
