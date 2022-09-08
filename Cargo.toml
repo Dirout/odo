@@ -47,7 +47,7 @@ liquid-core = "0.26.0"
 liquid-lib = { version = "0.26.0", features = ["stdlib", "jekyll", "shopify", "extra"] }
 mimalloc = { version = "0.1.28", default-features = false }
 run_script = "0.9.0"
-serde = "1.0.136"
+serde = "1.0.144"
 serde_yaml = "0.8.23"
 yaml-rust = "0.4.5"
 
