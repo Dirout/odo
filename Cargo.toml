@@ -39,7 +39,7 @@ doc = true
 
 [dependencies]
 ansi_term = "0.12.1"
-clap = { version = "3.1.8", features = ["cargo", "suggestions", "color", "wrap_help", "unicode"] }
+clap = { version = "4.0.17", features = ["cargo", "suggestions", "color", "wrap_help", "unicode"] }
 lazy_static = "1.4.0"
 linked-hash-map = "0.5.4"
 liquid = "0.26.0"
