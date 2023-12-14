@@ -35,7 +35,7 @@ jobs:
           libodo.dylib \
           libodo.a
       - name: Upload odo build artifacts to GitHub
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: aarch64-odo.osx
           path: ./target/aarch64-apple-darwin/release/aarch64-odo.osx.tar
